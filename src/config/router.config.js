@@ -21,6 +21,24 @@ export const asyncRouterMap = [
         component: () => import(/* webpackChunkName: "Article" */ '@/views/article'),
         meta: {title: '文章管理',icon: 'sound'},
       },
+      {
+        path: '/tags',
+        name: 'Tag',
+        component: () => import(/* webpackChunkName: "Tag" */ '@/views/tags'),
+        meta: {title: '标签管理',icon: 'tag'},
+      },
+      {
+        path: '/comment',
+        name: 'Comment',
+        component: () => import(/* webpackChunkName: "Comment" */ '@/views/comment'),
+        meta: {title: '评论管理',icon: 'snippets'},
+      },
+      {
+        path: '/message',
+        name: 'Message',
+        component: () => import(/* webpackChunkName: "Message" */ '@/views/message'),
+        meta: {title: '留言管理',icon: 'aliwangwang'},
+      },
       // {
       //   path: '/home',
       //   name: 'HomePage',

@@ -5,15 +5,8 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="6" :sm="24">
-              <a-form-item label="文章标题">
-                <a-input v-model="queryParam.title" placeholder="文章标题" allowClear />
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item label="文章标签">
-                <a-select v-model="queryParam.tag" placeholder="文章标签" allowClear>
-                  <a-select-option :value="item._id" v-for="item of tagList" :key="item._id">{{ item.title }}</a-select-option>
-                </a-select>
+              <a-form-item label="评论内容">
+                <a-input v-model="queryParam.content" placeholder="评论内容" allowClear />
               </a-form-item>
             </a-col>
             <a-col :md="!advanced && 6 || 24" :sm="24">
@@ -37,20 +30,9 @@
         :pagination="pagination"
         @change="paginationChange"
         :loading="loading"
-        :scroll="{x: _width}"
       >
-        <template slot="image" slot-scope="t,r">
-          <img :src="r.fileId.link" alt="" class="table-img">
-        </template>
-        <template slot="tag" slot-scope="t">
-          <a-tag color="green" v-if="t.length">{{ t[0].title }}</a-tag>
-        </template>
-        <!-- <template slot="tag" slot-scope="t">
-          <a-switch checked-children="正常" un-checked-children="冻结" :checked="t" />
-        </template> -->
-        <template slot="isRecommend" slot-scope="t">
-          <a-tag v-if="!t">否</a-tag>
-          <a-tag v-else color="green">是</a-tag>
+        <template slot="articleTitle" slot-scope="t,r">
+          <a-tag color="green">{{ r.article.title }}</a-tag>
         </template>
         <template slot="action" slot-scope="r">
           <a @click="handleEditorClick(r)">修改</a>
@@ -74,11 +56,10 @@
 <script>
 import CreateModal from './modules/CreateModal.vue'
 import { toggleQuery,showMessage } from '@/utils/mixins'
-import { getArticleList,deleteArticle,getTagList } from '@/api/manage'
-import { getFileName } from '@/utils/util'
+import { getMessageList,deleteMessage,getUserList } from '@/api/manage'
 
 export default {
-  name: 'Article',
+  name: 'Message',
   mixins: [toggleQuery,showMessage],
   components: {
     CreateModal
@@ -88,12 +69,9 @@ export default {
       queryParam: {},
       columns: [
         {title: '序号',customRender: (t,r,i) => `${i+1}`,width: 70,align: 'center'},
-        {title: '文章配图',scopedSlots: {customRender: 'image'},align:'center',width: 140},
-        {title: '文章标题',dataIndex: 'title',key: 'title',ellipsis: true,width:300},
-        {title: '文章摘要',dataIndex: 'description',key: 'description',ellipsis: true,width:500},
-        {title: '文章标签',dataIndex: 'tag',key: 'tag', scopedSlots: {customRender: 'tag'},align:'center'},
-        // {title: '状态',dataIndex: 'status',key: 'status',scopedSlots: {customRender: 'status'},align:'center'},
-        {title: '是否推荐',dataIndex: 'isRecommend',key: 'isRecommend',scopedSlots: {customRender: 'isRecommend'},align:'center',width: 100},
+        {title: '留言用户',scopedSlots: {customRender: 'articleTitle'},align:'center',width: 500,ellipsis:true},
+        {title: '留言内容',dataIndex: 'content',key: 'content'},
+        {title: '留言对象',dataIndex: 'content1',key: 'content1'},
         {title: '操作',scopedSlots: {customRender: 'action'},width: 120,align: 'center',fixed: 'right'}
       ],
       data: [],
@@ -107,20 +85,17 @@ export default {
       },
       pageNum: 1,
       pageSize: 10,
-      tagList: []
+      articleList: [],
+      userList: []
     }
   },
-  computed: {
-    _width() {
-      return this.columns.reduce((x,y) => {return x+y.width},0)
-    }
-  },
+  
   methods: {
     // 新增
     handleAddClick() {
       this.$refs.CreateModal.status = 1
       this.$refs.CreateModal.visible = true
-      this.$refs.CreateModal.title = '新增新闻'
+      this.$refs.CreateModal.title = '新增标签'
     },
     // 分页查询
     paginationChange(e) {
@@ -139,21 +114,14 @@ export default {
       this.$refs.CreateModal.id = r._id
       this.$refs.CreateModal.status = 2
       this.$refs.CreateModal.visible = true
-      this.$refs.CreateModal.title = '修改新闻'
+      this.$refs.CreateModal.title = '修改标签'
       for(const key in _form) {
         _form[key] = r[key]
-      }
-      if(r.fileId) {
-        this.$refs.CreateModal.fileList.push({
-          uid: r.fileId._id,
-          name: getFileName(r.fileId.link),
-          url: r.fileId.link
-        })
       }
     },
     // 删除
     handleDeleteClick(r) {
-      deleteArticle({id: r._id}).then(res => {
+      deleteMessage({id: r._id}).then(res => {
         if(res.code == 200) {
           this.showMessage(res,this.getList)
         }
@@ -162,7 +130,7 @@ export default {
     // 获取列表
     getList() {
       this.loading = true
-      getArticleList({
+      getMessageList({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         ...this.queryParam
@@ -170,23 +138,23 @@ export default {
         this.loading = false
         if(res.code == 200) {
           this.data = res.data.list
-          console.log(this.data)
           this.pagination.total = res.data.total
         }
       })
     },
-    // 获取标签
-    getTagList() {
-      getTagList({pageNum: 1,pageSize: 99}).then(res => {
+    // 获取用户列表
+    getUserList() {
+      getUserList().then(res => {
+        console.log(res)
         if(res.code == 200) {
-          this.tagList = res.data.list
+          this.userList = res.data
         }
       })
     }
   },
   mounted() {
     this.getList()
-    this.getTagList()
+    this.getUserList()
   }
 }
 </script>

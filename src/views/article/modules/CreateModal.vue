@@ -42,6 +42,14 @@
           :auto-size="{ minRows: 2, maxRows: 6 }"
         />
       </a-form-model-item>
+      <a-form-item label="文章标签">
+        <a-select v-model="form.tag" placeholder="文章标签" allowClear>
+          <a-select-option :value="item._id" v-for="item of parent.tagList" :key="item._id">{{ item.title }}</a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-model-item label="来源">
+        <a-input v-model="form.source" placeholder="文章来源" />
+      </a-form-model-item>
       <a-form-model-item label="是否推荐" prop="isRecommend">
         <a-select v-model="form.isRecommend" placeholder="是否推荐" style="width:50%;">
           <a-select-option :value="true">是</a-select-option>
@@ -54,6 +62,9 @@
           <a-select-option :value="2">行内资讯</a-select-option>
         </a-select>
       </a-form-model-item> -->
+      <a-form-model-item label="文章排序" prop="sortNum">
+        <a-input v-model="form.sortNum" placeholder="文章排序" />
+      </a-form-model-item>
       <a-form-model-item label="文章内容" required>
         <wangEditor :value="form.content" @change="editorChange"></wangEditor>
       </a-form-model-item>
@@ -81,7 +92,7 @@
 </template>
 
 <script>
-import { insertArticle } from '@/api/manage'
+import { insertArticle,updateArticle,getTagList } from '@/api/manage'
 import { showMessage } from '@/utils/mixins'
 import { uploadFile,deleteFile } from '@/api/common'
 import { getFileName } from '@/utils/util'
@@ -105,12 +116,14 @@ export default {
       labelCol: {span: 3},
       wrapperCol: {span: 21},
       form: {
+        tag: [],
         title: undefined,
         description: undefined,
         type: undefined,
         fileId:undefined,
         isRecommend: undefined,
-        content: undefined
+        content: undefined,
+        sortNum: undefined
       },
       rules: {
         title: [{required: true, message: '文章标题不能为空', trigger: 'blur'}],
@@ -183,7 +196,7 @@ export default {
               })
             })
           }else {
-            updateNews({
+            updateArticle({
               id: this.id,
               ...this.form
             }).then(res => {
@@ -201,7 +214,11 @@ export default {
     // 关闭
     onClose() {
       for(const key in this.form) {
-        this.form[key] = undefined
+        if(key == 'tag') {
+          this.form[key] = []
+        }else {
+          this.form[key] = undefined
+        }
       }
       this.status = undefined
       this.visible = false
