@@ -31,8 +31,11 @@
         @change="paginationChange"
         :loading="loading"
       >
-        <template slot="articleTitle" slot-scope="t,r">
-          <a-tag color="green">{{ r.article.title }}</a-tag>
+        <template slot="user" slot-scope="t,r">
+          <a-tag color="green">{{ r.user.nickname }}</a-tag>
+        </template>
+        <template slot="target" slot-scope="t,r">
+          <a-tag color="green">{{ r.target.nickname }}</a-tag>
         </template>
         <template slot="action" slot-scope="r">
           <a @click="handleEditorClick(r)">修改</a>
@@ -69,9 +72,9 @@ export default {
       queryParam: {},
       columns: [
         {title: '序号',customRender: (t,r,i) => `${i+1}`,width: 70,align: 'center'},
-        {title: '留言用户',scopedSlots: {customRender: 'articleTitle'},align:'center',width: 500,ellipsis:true},
+        {title: '留言用户',scopedSlots: {customRender: 'user'},align:'center',width: 150},
+        {title: '目标用户',scopedSlots: {customRender: 'target'},align:'center',width: 150},
         {title: '留言内容',dataIndex: 'content',key: 'content'},
-        {title: '留言对象',dataIndex: 'content1',key: 'content1'},
         {title: '操作',scopedSlots: {customRender: 'action'},width: 120,align: 'center',fixed: 'right'}
       ],
       data: [],
@@ -85,17 +88,15 @@ export default {
       },
       pageNum: 1,
       pageSize: 10,
-      articleList: [],
       userList: []
     }
   },
-  
   methods: {
     // 新增
     handleAddClick() {
       this.$refs.CreateModal.status = 1
       this.$refs.CreateModal.visible = true
-      this.$refs.CreateModal.title = '新增标签'
+      this.$refs.CreateModal.title = '新增留言'
     },
     // 分页查询
     paginationChange(e) {
@@ -114,10 +115,9 @@ export default {
       this.$refs.CreateModal.id = r._id
       this.$refs.CreateModal.status = 2
       this.$refs.CreateModal.visible = true
-      this.$refs.CreateModal.title = '修改标签'
-      for(const key in _form) {
-        _form[key] = r[key]
-      }
+      this.$refs.CreateModal.title = '修改留言'
+      _form.content = r.content
+      _form.target = r.target._id
     },
     // 删除
     handleDeleteClick(r) {
@@ -145,7 +145,6 @@ export default {
     // 获取用户列表
     getUserList() {
       getUserList().then(res => {
-        console.log(res)
         if(res.code == 200) {
           this.userList = res.data
         }

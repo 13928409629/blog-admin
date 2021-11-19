@@ -45,9 +45,9 @@
         <template slot="tag" slot-scope="t">
           <a-tag color="green" v-if="t.length">{{ t[0].title }}</a-tag>
         </template>
-        <!-- <template slot="tag" slot-scope="t">
-          <a-switch checked-children="正常" un-checked-children="冻结" :checked="t" />
-        </template> -->
+        <template slot="type" slot-scope="t,r">
+          <a-tag color="red">{{ r.menuId.title }}</a-tag>
+        </template>
         <template slot="isRecommend" slot-scope="t">
           <a-tag v-if="!t">否</a-tag>
           <a-tag v-else color="green">是</a-tag>
@@ -74,7 +74,7 @@
 <script>
 import CreateModal from './modules/CreateModal.vue'
 import { toggleQuery,showMessage } from '@/utils/mixins'
-import { getArticleList,deleteArticle,getTagList } from '@/api/manage'
+import { getArticleList,deleteArticle,getTagList,getMenuList } from '@/api/manage'
 import { getFileName } from '@/utils/util'
 
 export default {
@@ -92,6 +92,7 @@ export default {
         {title: '文章标题',dataIndex: 'title',key: 'title',ellipsis: true,width:300},
         {title: '文章摘要',dataIndex: 'description',key: 'description',ellipsis: true,width:500},
         {title: '文章标签',dataIndex: 'tag',key: 'tag', scopedSlots: {customRender: 'tag'},align:'center'},
+        {title: '文章归类',scopedSlots: {customRender: 'type'},align:'center'},
         // {title: '状态',dataIndex: 'status',key: 'status',scopedSlots: {customRender: 'status'},align:'center'},
         {title: '是否推荐',dataIndex: 'isRecommend',key: 'isRecommend',scopedSlots: {customRender: 'isRecommend'},align:'center',width: 100},
         {title: '操作',scopedSlots: {customRender: 'action'},width: 120,align: 'center',fixed: 'right'}
@@ -107,7 +108,8 @@ export default {
       },
       pageNum: 1,
       pageSize: 10,
-      tagList: []
+      tagList: [],
+      treeData: []
     }
   },
   computed: {
@@ -139,9 +141,15 @@ export default {
       this.$refs.CreateModal.id = r._id
       this.$refs.CreateModal.status = 2
       this.$refs.CreateModal.visible = true
-      this.$refs.CreateModal.title = '修改新闻'
+      this.$refs.CreateModal.title = '修改文章'
       for(const key in _form) {
-        _form[key] = r[key]
+        if(key == 'tag') {
+          _form[key] = r.tag && r.tag[0]._id
+        }else if(key == 'menuId') {
+          _form[key] = r.menuId && r.menuId._id
+        }else {
+          _form[key] = r[key]
+        }
       }
       if(r.fileId) {
         this.$refs.CreateModal.fileList.push({
@@ -170,7 +178,6 @@ export default {
         this.loading = false
         if(res.code == 200) {
           this.data = res.data.list
-          console.log(this.data)
           this.pagination.total = res.data.total
         }
       })
@@ -182,11 +189,20 @@ export default {
           this.tagList = res.data.list
         }
       })
+    },
+    // 获取菜单
+    getMenuList() {
+      getMenuList().then(res => {
+        if(res.code == 200) {
+          this.treeData = res.data
+        }
+      })
     }
   },
   mounted() {
     this.getList()
     this.getTagList()
+    this.getMenuList()
   }
 }
 </script>

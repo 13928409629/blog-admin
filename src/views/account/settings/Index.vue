@@ -13,12 +13,12 @@
             <a-menu-item key="/system/settings/basic">
               <router-link :to="{ name: 'BasicSettings'}">基本设置</router-link>
             </a-menu-item>
-            <a-menu-item key="/system/settings/company">
+            <!-- <a-menu-item key="/system/settings/company">
               <router-link :to="{ name: 'Company' }">公司介绍</router-link>
             </a-menu-item>
             <a-menu-item key="/system/settings/serve">
               <router-link :to="{ name: 'Serve' }">服务保障</router-link>
-            </a-menu-item>
+            </a-menu-item> -->
           </a-menu>
         </div>
         <div class="account-settings-info-right">

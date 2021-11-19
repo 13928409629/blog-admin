@@ -29,9 +29,10 @@ export default {
     }
   },
   watch: {
-    value (val) {
-      this.editorContent = val
-      this.editor.txt.html(val)
+    value: function(value) {
+      if (value !== this.editor.txt.html()) {
+        this.editor.txt.html(this.value)
+      }
     }
   },
   mounted () {

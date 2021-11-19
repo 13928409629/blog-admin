@@ -3,23 +3,46 @@
     <a-row :gutter="16" type="flex">
       <a-col :order="isMobile ? 2 : 1" :md="16" :lg="16">
         <a-form layout="vertical" :form="form">
-          <a-form-item label="公司名称">
-            <a-input placeholder="公司名称" v-model="form.name" />
+          <a-form-item label="用户头像">
+            <div class="ant-upload-preview" @click="$refs.modal.edit()">
+              <a-icon type="cloud-upload-o" class="upload-icon" />
+              <div class="mask">
+                <a-icon type="plus" />
+              </div>
+              <img :src="option.img" />
+            </div>
           </a-form-item>
-          <a-form-item label="公司地址">
-            <a-input placeholder="公司地址" v-model="form.address" />
+          <a-form-item label="博客名">
+            <a-input placeholder="博客名" v-model="form.name" style="width:50%" />
           </a-form-item>
-          <a-form-item label="公司成立时间">
+          <a-form-item label="关于我">
+            <wangEditor v-model="form.aboutMe" @change="editorChange"></wangEditor>
+          </a-form-item>
+          <a-form-item label="座右铭">
+            <a-textarea
+              v-model="form.motto"
+              placeholder="座右铭"
+              :auto-size="{ minRows: 3, maxRows: 5 }"
+            />
+          </a-form-item>
+          <a-form-item label="个性签名">
+            <a-textarea
+              v-model="form.signature"
+              placeholder="个性签名"
+              :auto-size="{ minRows: 3, maxRows: 5 }"
+            />
+          </a-form-item>
+          <!-- <a-form-item label="公司成立时间">
             <a-date-picker v-model="form.establishDate" valueFormat="YYYY-MM-DD" style="width:50%" />
-          </a-form-item>
-          <a-form-item label="客服QQ">
+          </a-form-item> -->
+          <a-form-item label="QQ">
             <a-input-number placeholder="客服QQ" v-model="form.qq" style="width:50%;" />
           </a-form-item>
-          <a-form-item label="服务热线">
-            <a-input placeholder="服务热线" v-model="form.tel" style="width: 100%" />
+          <a-form-item label="微信">
+            <a-input placeholder="微信" v-model="form.wx" style="width: 100%" />
           </a-form-item>
           <a-form-item label="网站seo关键字">
-            <a-input placeholder="seo关键字" v-model="form.seoKeyword" />
+            <a-input placeholder="seo关键字" v-model="form.seoKeywords" />
           </a-form-item>
           <a-form-item label="网站seo描述">
             <a-textarea
@@ -31,7 +54,7 @@
           <a-form-item label="邮箱">
             <a-input placeholder="邮箱" v-model="form.email" />
           </a-form-item>
-          <a-form-item label="公司Logo">
+          <!-- <a-form-item label="公司Logo">
             <a-upload
               list-type="picture-card"
               :file-list="fileList"
@@ -46,23 +69,14 @@
                 <div class="ant-upload-text">添加图片</div>
               </div>
             </a-upload>
-          </a-form-item>
-          <a-form-item label="二维码">
-            <div class="ant-upload-preview" @click="$refs.modal.edit(1)">
-              <a-icon type="cloud-upload-o" class="upload-icon" />
-              <div class="mask">
-                <a-icon type="plus" />
-              </div>
-              <img :src="locationOrigin+option.img" />
-            </div>
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item>
             <a-button type="primary" @click="hanldeUpdateClick">更新基本设置</a-button>
           </a-form-item>
         </a-form>
       </a-col>
     </a-row>
-    <avatar-modal ref="modal" @ok="setavatar" />
+    <avatar-modal ref="modal" @ok="setavatar" :parent="this" />
     <a-modal :visible="previewVisible" :footer="null" @cancel="previewVisible = false" width="60%">
       <img alt="example" style="width: 100%" :src="previewImage" />
     </a-modal>
@@ -73,29 +87,31 @@
 import AvatarModal from './AvatarModal'
 import { baseMixin } from '@/store/app-mixin'
 import { showMessage } from '@/utils/mixins'
-import { getCompanyDetail,updateCompanyInfo } from '@/api/manage'
+import { getSystemInfo,updateSystemInfo } from '@/api/manage'
 import { uploadFile,deleteFile } from '@/api/common'
 import { getFileName } from '@/utils/util'
+import wangEditor from '@/components/Editor/WangEditor.vue'
 
 export default {
   mixins: [baseMixin,showMessage],
   components: {
-    AvatarModal
+    AvatarModal,
+    wangEditor
   },
   data () {
     return {
       preview: {},
       form: {
-        qq: undefined,
         name: undefined,
-        establishDate: undefined,
-        tel: undefined,
-        logo: undefined,
-        address: undefined,
-        email: undefined,
-        weixin: undefined,
-        seoKeyword: undefined,
-        seoDescription: undefined
+        qq: undefined,
+        wx: undefined,
+        avatar: undefined,
+        motto: undefined,
+        signature: undefined,
+        aboutMe: undefined,
+        seoKeywords: undefined,
+        seoDescription:undefined,
+        email: undefined
       },
       option: {
         img: '',
@@ -115,7 +131,8 @@ export default {
       fileList: [],
       previewVisible: false,
       previewImage: '',
-      locationOrigin: process.env.VUE_APP_API_ORIGIN
+      locationOrigin: process.env.VUE_APP_API_ORIGIN,
+      avatarId: undefined
     }
   },
   methods: {
@@ -152,39 +169,51 @@ export default {
         }
       })
     },
-    setavatar (url) {
-      this.form.weixin = url
-      this.option.img = url
+    editorChange(val) {
+      this.form.aboutMe = val
+    },
+    setavatar (data) {
+      this.form.avatar = data._id
+      this.option.img = data.link
+      this.hanldeUpdateClick()
     },
     // 获取公司介绍
-    getCompanyDetail() {
-      getCompanyDetail().then(res => {
+    getSystemInfo() {
+      getSystemInfo().then(res => {
         if(res.code == 200) {
-          for(const key in this.form) {
-            this.form[key] = res.data[key]
+          res = res.data
+          if(res) {
+            for(const key in this.form) {
+              if(key != 'avatar') {
+                this.form[key] = res[key]
+              }else {
+                this.form[key] = res[key] && res[key]._id
+              }
+            }
+            if(res.avatar) {
+              this.avatarId = res.avatar._id
+              this.fileList = [
+                {uid: this.avatarId,id: this.avatarId, name: getFileName(res.avatar.link),url: res.avatar.link}
+              ]
+              this.option.img = res.avatar.link || ''
+            }
           }
-          if(res.data.logo) {
-            this.fileList = [
-              {uid: Math.random(),name: getFileName(res.data.logo),url: process.env.VUE_APP_API_ORIGIN+res.data.logo}
-            ]
-          }
-          this.option.img = res.data.weixin || ''
         }
       })
     },
     // 更新公司介绍
     hanldeUpdateClick() {
       this.loading = true
-      updateCompanyInfo(this.form).then(res => {
+      updateSystemInfo(this.form).then(res => {
         this.loading = false
         if(res.code == 200) {
-          this.showMessage(res,this.getCompanyDetail)
+          this.showMessage(res,this.getSystemInfo)
         }
       })
     }
   },
   mounted() {
-    this.getCompanyDetail()
+    this.getSystemInfo()
   }
 }
 </script>
@@ -200,8 +229,9 @@ export default {
 
 .ant-upload-preview {
   position: relative;
-  width: 120px;
+  width: 140px;
   box-shadow: 0 0 4px #ccc;
+  border-radius: 50%;
   .upload-icon {
     position: absolute;
     top: 0;
@@ -234,10 +264,10 @@ export default {
   }
   img,
   .mask {
-    width: 100%;
-    max-width: 180px;
-    height: 100%;
+    width: 140px !important;
+    height: 140px !important;
     overflow: hidden;
+    border-radius: 50%;
   }
 
 }

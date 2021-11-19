@@ -16,6 +16,21 @@
       :wrapper-col="wrapperCol" 
       :key="visible"
     >
+      <a-form-model-item label="文章归类" prop="menuId">
+        <a-tree-select
+          v-model="form.menuId"
+          style="width: 50%"
+          :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+          :tree-data="parent.treeData"
+          placeholder="文章归类"
+          tree-default-expand-all
+          :replaceFields="{
+            key: '_id',
+            value: '_id'
+          }"
+        >
+        </a-tree-select>
+      </a-form-model-item>
       <a-form-model-item label="文章标题" prop="title">
         <a-input v-model="form.title" placeholder="文章标题" />
       </a-form-model-item>
@@ -116,6 +131,7 @@ export default {
       labelCol: {span: 3},
       wrapperCol: {span: 21},
       form: {
+        menuId: undefined,
         tag: [],
         title: undefined,
         description: undefined,

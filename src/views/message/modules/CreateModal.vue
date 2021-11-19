@@ -16,22 +16,22 @@
       :wrapper-col="wrapperCol" 
       :key="visible"
     >
-      <a-form-model-item label="选择文章" prop="article">
+      <a-form-model-item label="目标用户" prop="target">
         <a-select 
           show-search
-          v-model="form.article" 
-          placeholder="选择文章" 
+          v-model="form.target" 
+          placeholder="目标用户" 
           allowClear 
           style="width:50%;"
           :filter-option="(input, option) => option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0"
         >
-          <a-select-option :value="item._id" v-for="item of parent.articleList" :key="item._id">{{ item.title }}</a-select-option>
+          <a-select-option :value="item._id" v-for="item of parent.userList" :key="item._id">{{ item.nickname }}</a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="评论内容" prop="content">
+      <a-form-model-item label="留言内容" prop="content">
         <a-textarea
           v-model="form.content"
-          placeholder="评论内容"
+          placeholder="留言内容"
           :auto-size="{ minRows: 3, maxRows: 5 }"
         />
       </a-form-model-item>
@@ -78,8 +78,8 @@ export default {
         content: undefined,
       },
       rules: {
-        article: [{required: true, message: '文章不能为空', trigger: 'change'}],
-        content: [{required: true, message: '评论内容不能为空', trigger: 'blur'}],
+        target: [{required: true, message: '目标用户不能为空', trigger: 'change'}],
+        content: [{required: true, message: '留言内容不能为空', trigger: 'blur'}],
       },
       status: undefined,
       id: undefined,

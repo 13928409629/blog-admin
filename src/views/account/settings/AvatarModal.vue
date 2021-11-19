@@ -54,13 +54,18 @@
   </a-modal>
 </template>
 <script>
-import { uploadFile } from '@/api/common'
+import { uploadFile,deleteFile } from '@/api/common'
 
 export default {
+  props: {
+    parent: {
+      type: Object,
+      default:() => ({})
+    }
+  },
   data() {
     return {
       visible: false,
-      id: null,
       confirmLoading: false,
       fileList: [],
       uploading: false,
@@ -73,13 +78,13 @@ export default {
         fixedBox: true,
       },
       previews: {},
-      fileName: ''
+      fileName: '',
+      fileId: undefined
     }
   },
   methods: {
-    edit(id) {
+    edit() {
       this.visible = true
-      this.id = id
       /* 获取原始头像 */
     },
     close() {
@@ -87,6 +92,11 @@ export default {
       this.visible = false
     },
     cancelHandel() {
+      if(this.fileId) {
+        deleteFile({id: this.fileId}).then(res => {
+          this.fileId = undefined
+        }) 
+      }
       this.close()
     },
     changeScale(num) {
@@ -129,6 +139,10 @@ export default {
           uploadFile(formData).then((res) => {
             if (res.code == 200) {
               _this.$message.success('上传成功')
+              this.fileId = res.data._id
+              if(_this.parent.avatarId) {
+                deleteFile({id: _this.parent.avatarId})
+              }
               this.visible = false
               _this.$emit('ok', res.data)
             }
@@ -158,7 +172,6 @@ export default {
     },
     okHandel() {
       const vm = this
-
       vm.confirmLoading = true
       setTimeout(() => {
         vm.confirmLoading = false
@@ -175,10 +188,10 @@ export default {
 </script>
 
 <style lang="less">
-.ant-upload-preview {
-  width: 180px !important;
-  height: 180px !important;
-}
+// .ant-upload-preview {
+//   width: 180px !important;
+//   height: 180px !important;
+// }
 .ant-upload-preview .mask {
   width: 180px !important;
   height: 180px !important;
@@ -189,13 +202,14 @@ export default {
   display: block;
 }
 
-// .avatar-upload-preview {
-//   position: absolute;
-//   top: 50%;
-//   transform: translate(50%, -50%);
-//   width: 180px;
-//   height: 180px;
-//   box-shadow: 0 0 4px #ccc;
-//   overflow: hidden;
-// }
+.avatar-upload-preview {
+  position: absolute;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: 180px;
+  height: 180px;
+  box-shadow: 0 0 4px #ccc;
+  overflow: hidden;
+  border-radius: 50%;
+}
 </style>

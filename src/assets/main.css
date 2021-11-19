@@ -7,3 +7,6 @@
 .table-img {
   height: 40px;
 }
+.ant-form-item-control-wrapper {
+  z-index: 99;
+}

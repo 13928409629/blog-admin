@@ -1,5 +1,6 @@
 <template>
   <page-header-wrapper :title="false">
+    <a-button icon="plus" @click="handleAddMenu" type="primary" style="margin-bottom:20px;">添加一级菜单</a-button>
     <a-card class="content-card">
       <a-table 
         size="middle"
@@ -12,22 +13,20 @@
           <a-tag v-else color="red">系列菜单</a-tag>
         </template>
         <template slot="action" slot-scope="r">
-          <template v-if="r.type==2">
+          <template v-if="!r.parentId">
             <a @click="handleAddClick(r)">新增</a>
             <a-divider type="vertical"></a-divider>
           </template>
           <a @click="handleEditorClick(r)">修改</a>
-          <template v-if="r._id!=5 && r.parentId">
-            <a-divider type="vertical"></a-divider>
-            <a-popconfirm
-              title="您确定要删除吗?"
-              ok-text="确定"
-              cancel-text="取消"
-              @confirm="hanldeDelete(r)"
-            >
-              <a>删除</a>
-            </a-popconfirm>
-          </template>
+          <a-divider type="vertical"></a-divider>
+          <a-popconfirm
+            title="您确定要删除吗?"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="hanldeDelete(r)"
+          >
+            <a>删除</a>
+          </a-popconfirm>
         </template>
       </a-table>
     </a-card>
@@ -37,7 +36,7 @@
 </template>
 
 <script>
-import { getMenuTree,deleteMenu } from '@/api/manage'
+import { getMenuList,deleteMenu } from '@/api/manage'
 import { showMessage } from '@/utils/mixins'
 import CreateModal from './modules/CreateModal.vue'
 
@@ -51,11 +50,13 @@ export default {
     return {
       columns: [
         { title: '菜单名称', dataIndex: 'title', key: 'title' },
+        { title: '菜单路由', dataIndex: 'path', key: 'path',customRender: (t) => {
+          return <a-tag color="green">{t}</a-tag>
+        }},
         { title: '排序', dataIndex: 'sortNum', key: 'sortNum',align:'center' },
-        { title: '类型', scopedSlots: {customRender: 'type'},align:'center'},
         { title: '操作', scopedSlots: { customRender: 'action' }, align: 'left', fixed: 'right',width: 160 },
       ],
-      data: []
+      data: [],
     }
   },
   methods: {
@@ -65,13 +66,14 @@ export default {
         this.showMessage(res,this.getList)
       })
     },
-    // 新增
+    //添加一级菜单
+    handleAddMenu() {
+      this.$refs.createModal.status = 1
+      this.$refs.createModal.visible = true
+      this.$refs.createModal.form.parentId = undefined
+    },
+    // 新增子菜单
     handleAddClick(r) {
-      if(r._id == 5) {
-        this.$refs.createModal.form.type = 2
-      }else {
-        this.$refs.createModal.form.type = 1
-      }
       this.$refs.createModal.form.parentId = r._id
       this.$refs.createModal.visible = true
       this.$refs.createModal.status = 1
@@ -98,22 +100,12 @@ export default {
     },
     // 获取列表
     getList() {
-      getMenuTree().then(res => {
+      getMenuList().then(res => {
         if(res.code == 200) {
-          this.data = this.dealMenuList( res.data )
+          this.data = res.data
         }
       })
     },
-    dealMenuList(list) {
-      list.forEach(item => {
-        if(!item.children || !item.children.length) {
-          delete item.children
-        }else {
-          this.dealMenuList(item.children)
-        }
-      })
-      return list
-    }
   },
   mounted() {
     this.getList()

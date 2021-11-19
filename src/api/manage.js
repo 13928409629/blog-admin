@@ -19,9 +19,16 @@ const api = {
   insertMessage: '/message/insert', // 插入留言
   deleteMessage: '/message/delete', // 删除留言
   getMessageList: '/message/list', // 查询留言列表
-  updateMessage: '/message/update', // 查询留言列表
+  updateMessage: '/message/update', // 修改留言
 
   getUserList: '/user/list', // 获取用户列表
+  getSystemInfo: '/system/list', //查询系统设置信息
+  updateSystemInfo: '/system/update', //更新系统设置信息
+
+  insertMenu: '/menu/insert', // 添加菜单
+  deleteMenu: '/menu/delete', // 删除菜单
+  getMenuList: '/menu/list', // 查询菜单列表
+  updateMenu: '/menu/update', // 修改菜单
 }
 
 export default api
@@ -149,5 +156,48 @@ export function getUserList (params) {
     url: api.getUserList,
     method: 'get',
     params: params
+  })
+}
+export function getSystemInfo () {
+  return request({
+    url: api.getSystemInfo,
+    method: 'get',
+  })
+}
+export function updateSystemInfo (params) {
+  return request({
+    url: api.updateSystemInfo,
+    method: 'post',
+    data: params
+  })
+}
+
+// 菜单
+export function insertMenu (params) {
+  return request({
+    url: api.insertMenu,
+    method: 'post',
+    data: params
+  })
+}
+export function deleteMenu (params) {
+  return request({
+    url: api.deleteMenu,
+    method: 'post',
+    params: params
+  })
+}
+export function getMenuList (params) {
+  return request({
+    url: api.getMenuList,
+    method: 'get',
+    params: params
+  })
+}
+export function updateMenu (params) {
+  return request({
+    url: api.updateMenu,
+    method: 'post',
+    data: params
   })
 }

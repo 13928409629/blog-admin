@@ -32,7 +32,7 @@
         :loading="loading"
       >
         <template slot="articleTitle" slot-scope="t,r">
-          <a-tag color="green">{{ r.article.title }}</a-tag>
+          <a-tag color="green">{{ r.article && r.article.title }}</a-tag>
         </template>
         <template slot="action" slot-scope="r">
           <a @click="handleEditorClick(r)">修改</a>
@@ -136,7 +136,6 @@ export default {
         this.loading = false
         if(res.code == 200) {
           this.data = res.data.list
-          console.log(this.data)
           this.pagination.total = res.data.total
         }
       })

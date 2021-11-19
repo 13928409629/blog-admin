@@ -17,12 +17,15 @@
       :key="visible"
     >
       <a-form-model-item label="菜单名称" prop="title">
-        <a-input v-model="form.title" />
+        <a-input v-model="form.title" placeholder="菜单名称" />
+      </a-form-model-item>
+      <a-form-model-item label="菜单路由" prop="path">
+        <a-input v-model="form.path" placeholder="菜单路由" :disabled="status==2" />
       </a-form-model-item>
       <a-form-model-item label="排序">
-        <a-input-number style="width:100px" v-model="form.sortNum" />
+        <a-input-number style="width:100px" v-model="form.sortNum" placeholder="排序" />
       </a-form-model-item>
-      <a-form-model-item label="图片" v-if="form.type==2" required>
+      <!-- <a-form-model-item label="图片" v-if="form.type==2" required>
         <a-upload
           :customRequest="handleUploadChange"
           list-type="picture-card"
@@ -35,7 +38,7 @@
             <div class="ant-upload-text">上传图片</div>
           </div>
         </a-upload>
-      </a-form-model-item>
+      </a-form-model-item> -->
     </a-form-model>
     <div
       :style="{
@@ -63,7 +66,7 @@
 import { uploadFile,deleteFile } from '@/api/common'
 import { getFileName } from '@/utils/util'
 import { showMessage } from '@/utils/mixins'
-import { updateMenuTree,addMenu } from '@/api/manage'
+import { updateMenu,insertMenu } from '@/api/manage'
 
 export default {
   mixins: [showMessage],
@@ -81,8 +84,8 @@ export default {
       form: {
         parentId: undefined,
         title: undefined,
-        type: undefined,
-        imgUrl: undefined,
+        path: undefined,
+        // imgUrl: undefined,
         sortNum: undefined
       },
       rules: {
@@ -138,7 +141,7 @@ export default {
         if(vaild) {
           this.form.href = this.form.type == 2 ? '/products': '/product_list'
           if(this.status==1) {
-            addMenu(this.form).then(res => {
+            insertMenu(this.form).then(res => {
               if(res.code == 200) {
                 this.showMessage(res,() => {
                   this.parent.getList()
@@ -147,7 +150,7 @@ export default {
               }
             })
           }else {
-            updateMenuTree({
+            updateMenu({
               id: this.id,
               ...this.form
             }).then(res => {

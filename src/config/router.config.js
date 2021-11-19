@@ -1,44 +1,90 @@
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+import {
+  UserLayout,
+  BasicLayout,
+  BlankLayout
+} from '@/layouts'
+import {
+  bxAnaalyse
+} from '@/core/icons'
 
 const RouteView = {
   name: 'RouteView',
   render: h => h('router-view')
 }
 
-export const asyncRouterMap = [
-  {
+export const asyncRouterMap = [{
     path: '/',
     name: 'index',
     component: BasicLayout,
-    meta: {title: '首页'},
+    meta: {
+      title: '首页'
+    },
     redirect: '/article',
-    children: [
-      {
+    children: [{
         path: '/article',
         name: 'Article',
-        component: () => import(/* webpackChunkName: "Article" */ '@/views/article'),
-        meta: {title: '文章管理',icon: 'sound'},
+        component: () => import( /* webpackChunkName: "Article" */ '@/views/article'),
+        meta: {
+          title: '文章管理',
+          icon: 'sound'
+        },
       },
       {
         path: '/tags',
         name: 'Tag',
-        component: () => import(/* webpackChunkName: "Tag" */ '@/views/tags'),
-        meta: {title: '标签管理',icon: 'tag'},
+        component: () => import( /* webpackChunkName: "Tag" */ '@/views/tags'),
+        meta: {
+          title: '标签管理',
+          icon: 'tag'
+        },
       },
       {
         path: '/comment',
         name: 'Comment',
-        component: () => import(/* webpackChunkName: "Comment" */ '@/views/comment'),
-        meta: {title: '评论管理',icon: 'snippets'},
+        component: () => import( /* webpackChunkName: "Comment" */ '@/views/comment'),
+        meta: {
+          title: '评论管理',
+          icon: 'snippets'
+        },
       },
       {
         path: '/message',
         name: 'Message',
-        component: () => import(/* webpackChunkName: "Message" */ '@/views/message'),
-        meta: {title: '留言管理',icon: 'aliwangwang'},
+        component: () => import( /* webpackChunkName: "Message" */ '@/views/message'),
+        meta: {
+          title: '留言管理',
+          icon: 'aliwangwang'
+        },
       },
+      {
+        path: '/webMenu',
+        name: 'WebMenu',
+        component: () => import(/* webpackChunkName: "WebMenu" */ '@/views/web-menu'),
+        meta: {title: '网站菜单',icon: 'slack'},
+      },
+      {
+        path: '/system/settings',
+        component: () => import('@/views/account/settings/Index'),
+        redirect: '/system/settings/basic',
+        name: 'settings',
+        meta: {
+          title: '博客设置',
+          icon: 'setting',
+          keepAlive: true
+        },
+        hideChildrenInMenu: true,
+        children: [{
+          path: '/system/settings/basic',
+          name: 'BasicSettings',
+          component: () => import('@/views/account/settings/BasicSetting'),
+          meta: {
+            title: '基本设置',
+            hidden: true
+          }
+        }]
+      },
+      
       // {
       //   path: '/home',
       //   name: 'HomePage',
@@ -57,12 +103,7 @@ export const asyncRouterMap = [
       //   component: () => import(/* webpackChunkName: "Download" */ '@/views/donwload'),
       //   meta: {title: '资料下载',icon: 'cloud-download'},
       // },
-      // {
-      //   path: '/webMenu',
-      //   name: 'WebMenu',
-      //   component: () => import(/* webpackChunkName: "WebMenu" */ '@/views/web-menu'),
-      //   meta: {title: '网站菜单',icon: 'slack'},
-      // },
+
       // {
       //   path: '/userList',
       //   name: 'UserList',
@@ -188,27 +229,25 @@ export const asyncRouterMap = [
  * 基础路由
  * @type { *[] }
  */
-export const constantRouterMap = [
-  {
+export const constantRouterMap = [{
     path: '/user',
     component: UserLayout,
     redirect: '/user/login',
     hidden: true,
-    children: [
-      {
+    children: [{
         path: 'login',
         name: 'login',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/Login')
       },
       {
         path: 'register',
         name: 'register',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/Register')
       },
       {
         path: 'register-result',
         name: 'registerResult',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/RegisterResult')
       },
       {
         path: 'recover',
@@ -220,6 +259,6 @@ export const constantRouterMap = [
 
   {
     path: '/404',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
+    component: () => import( /* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]
