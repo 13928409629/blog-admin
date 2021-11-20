@@ -139,7 +139,8 @@ export default {
         fileId:undefined,
         isRecommend: undefined,
         content: undefined,
-        sortNum: undefined
+        sortNum: undefined,
+        source: undefined
       },
       rules: {
         title: [{required: true, message: '文章标题不能为空', trigger: 'blur'}],
