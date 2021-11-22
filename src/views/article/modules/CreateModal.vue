@@ -34,7 +34,7 @@
       <a-form-model-item label="文章标题" prop="title">
         <a-input v-model="form.title" placeholder="文章标题" />
       </a-form-model-item>
-      <a-form-model-item label="文章封面图" required>
+      <a-form-model-item label="文章封面图">
         <a-upload
           list-type="picture-card"
           :file-list="fileList"
@@ -163,7 +163,7 @@ export default {
     },
     // 删除图片
     hanldeImgRemove(file) {
-      deleteFile({id: file.id}).then(res => {
+      deleteFile({id: file.uid}).then(res => {
         if(res.code == 200) {
           this.showMessage(res,() => {
             this.fileList = []
@@ -199,10 +199,6 @@ export default {
         if(vaild) {
           if(!this.form.content) {
             this.$message.warning('文章内容不能为空！')
-            return
-          }
-          if(!this.form.fileId) {
-            this.$message.warning('文章图片不能为空！')
             return
           }
           if(this.status == 1) {

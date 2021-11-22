@@ -12,7 +12,7 @@ Router.prototype.push = function push (location, onResolve, onReject) {
 Vue.use(Router)
 const isProd = process.env.NODE_ENV === 'production'
 export default new Router({
-  base:  isProd ? '/': '/',
+  base:  isProd ? '/blog/admin/': '/',
   mode: 'history',
   routes: constantRouterMap.concat(asyncRouterMap)
 })

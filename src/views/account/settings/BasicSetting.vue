@@ -193,7 +193,7 @@ export default {
             if(res.avatar) {
               this.avatarId = res.avatar._id
               this.fileList = [
-                {uid: this.avatarId,id: this.avatarId, name: getFileName(res.avatar.link),url: res.avatar.link}
+                {uid: this.avatarId, name: getFileName(res.avatar.link),url: res.avatar.link}
               ]
               this.option.img = res.avatar.link || ''
             }

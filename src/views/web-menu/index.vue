@@ -89,7 +89,7 @@ export default {
         if(key != 'menuImg') {
           _form[key] = r[key]
         }else {
-          _form[key] = r[key]._id
+          _form[key] = r[key] && r[key]._id
         }
       }
       // 这是系列带图片的菜单
@@ -98,7 +98,6 @@ export default {
           {
             name: getFileName(r.menuImg.link),
             uid: r.menuImg._id,
-            id: r.menuImg._id,
             url: r.menuImg.link
           }
         ]

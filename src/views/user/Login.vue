@@ -6,8 +6,9 @@
         type="error"
         showIcon
         style="margin-bottom: 24px"
-        :message="$t('user.login.message-invalid-credentials')"
-      />
+      >
+        <span slot="message">{{ errorInfo }}</span>
+      </a-alert>
       <a-form-item>
         <a-input
           size="large"
@@ -91,6 +92,7 @@ export default {
         loginType: 0,
         smsSendBtn: false,
       },
+      errorInfo: undefined
     }
   },
   methods: {
@@ -190,6 +192,7 @@ export default {
       })
     },
     loginSuccess(res) {
+      this.errorInfo = undefined
       storage.set('userInfo',res.user)
       storage.set('token',res.token)
       // 延迟 1 秒显示欢迎信息
@@ -204,11 +207,12 @@ export default {
     },
     requestFailed(err) {
       this.isLoginError = true
-      this.$notification['error']({
-        message: 'error',
-        description: err.response.data.error,
-        duration: 4,
-      })
+      this.errorInfo = err.response.data.error
+      // this.$notification['error']({
+      //   message: 'error',
+      //   description: err.response.data.error,
+      //   duration: 4,
+      // })
     },
   },
   mounted() {

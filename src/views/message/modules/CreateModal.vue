@@ -16,10 +16,10 @@
       :wrapper-col="wrapperCol" 
       :key="visible"
     >
-      <a-form-model-item label="目标用户" prop="target">
+      <a-form-model-item label="目标用户" prop="user">
         <a-select 
           show-search
-          v-model="form.target" 
+          v-model="form.user" 
           placeholder="目标用户" 
           allowClear 
           style="width:50%;"
@@ -74,11 +74,12 @@ export default {
       labelCol: {span: 3},
       wrapperCol: {span: 21},
       form: {
-        article: undefined,
+        user: undefined,
         content: undefined,
+        status: true
       },
       rules: {
-        target: [{required: true, message: '目标用户不能为空', trigger: 'change'}],
+        user: [{required: true, message: '目标用户不能为空', trigger: 'change'}],
         content: [{required: true, message: '留言内容不能为空', trigger: 'blur'}],
       },
       status: undefined,
@@ -118,6 +119,7 @@ export default {
       for(const key in this.form) {
         this.form[key] = undefined
       }
+      this.form.status = true
       this.status = undefined
       this.visible = false
       this.id = undefined

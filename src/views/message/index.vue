@@ -133,7 +133,6 @@ export default {
     },
     // 回复
     handleReplyClick(r) {
-      console.log(r)
       this.visible = true
       this.id = r._id
     },
@@ -156,13 +155,15 @@ export default {
     },
     // 修改
     handleEditorClick(r) {
+      console.log(r)
       const _form = this.$refs.CreateModal.form
       this.$refs.CreateModal.id = r._id
       this.$refs.CreateModal.status = 2
       this.$refs.CreateModal.visible = true
       this.$refs.CreateModal.title = '修改留言'
       _form.content = r.content
-      _form.target = r.target._id
+      _form.user = r.user._id
+      _form.status = true
     },
     // 删除
     handleDeleteClick(r) {

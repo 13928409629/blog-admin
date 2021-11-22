@@ -122,13 +122,16 @@ export default {
         okType: 'danger',
         cancelText: '取消',
         onOk: () => {
-          _this.$store.dispatch('Logout').then((res) => {
-            if (res.code == 200) {
-              storage.clearAll()
-              _this.$router.replace({ path: '/user/login' })
-              location.reload()
-            }
-          })
+          localStorage.removeItem('token')
+          _this.$router.replace({ path: '/user/login' })
+          storage.clearAll()
+          // _this.$store.dispatch('Logout').then((res) => {
+          //   if (res.code == 200) {
+          //     storage.clearAll()
+          //     _this.$router.replace({ path: '/user/login' })
+          //     location.reload()
+          //   }
+          // })
         },
       })
     },

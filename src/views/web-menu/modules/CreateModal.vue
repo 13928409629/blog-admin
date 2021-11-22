@@ -22,6 +22,13 @@
       <a-form-model-item label="菜单路由" prop="path">
         <a-input v-model="form.path" placeholder="菜单路由" :disabled="status==2" />
       </a-form-model-item>
+      <a-form-model-item label="菜单描述">
+        <a-textarea
+          v-model="form.description"
+          placeholder="菜单描述"
+          :auto-size="{ minRows: 3, maxRows: 5 }"
+        />
+      </a-form-model-item>
       <a-form-model-item label="排序">
         <a-input-number style="width:100px" v-model="form.sortNum" placeholder="排序" />
       </a-form-model-item>
@@ -86,6 +93,7 @@ export default {
         title: undefined,
         path: undefined,
         menuImg: undefined,
+        description: undefined,
         sortNum: undefined
       },
       rules: {
@@ -101,7 +109,7 @@ export default {
   methods: {
     // 删除图片
     hanldeImgRemove(file) {
-      deleteFile({id: file.id}).then(res => {
+      deleteFile({id: file.uid}).then(res => {
         if(res.code == 200) {
           this.showMessage(res,() => {
             this.fileList = []
