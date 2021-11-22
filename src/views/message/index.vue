@@ -34,10 +34,12 @@
         <template slot="user" slot-scope="t,r">
           <a-tag color="green">{{ r.user.nickname }}</a-tag>
         </template>
-        <template slot="target" slot-scope="t,r">
-          <a-tag color="green">{{ r.target.nickname }}</a-tag>
+        <template slot="target">
+          <a-tag color="green">系统管理员</a-tag>
         </template>
         <template slot="action" slot-scope="r">
+          <a @click="handleReplyClick(r)">回复</a>
+          <a-divider type="vertical"></a-divider>
           <a @click="handleEditorClick(r)">修改</a>
           <a-divider type="vertical"></a-divider>
           <a-popconfirm
@@ -53,13 +55,26 @@
     </a-card>
     <!-- 新增 -->
     <CreateModal ref="CreateModal" :parent="this"></CreateModal>
+    <!-- 回复框 -->
+    <a-modal
+      title="回复留言"
+      :visible="visible"
+      @ok="handleReplyOk"
+      @cancel="visible=false"
+    >
+      <a-textarea
+        v-model="content"
+        placeholder="留言内容"
+        :auto-size="{ minRows: 3, maxRows: 5 }"
+      />
+    </a-modal>
   </page-header-wrapper>
 </template>
 
 <script>
 import CreateModal from './modules/CreateModal.vue'
 import { toggleQuery,showMessage } from '@/utils/mixins'
-import { getMessageList,deleteMessage,getUserList } from '@/api/manage'
+import { getMessageList,deleteMessage,getUserList,replyMessage } from '@/api/manage'
 
 export default {
   name: 'Message',
@@ -69,13 +84,16 @@ export default {
   },
   data () {
     return {
+      visible: false,
+      content: '',
       queryParam: {},
       columns: [
         {title: '序号',customRender: (t,r,i) => `${i+1}`,width: 70,align: 'center'},
         {title: '留言用户',scopedSlots: {customRender: 'user'},align:'center',width: 150},
         {title: '目标用户',scopedSlots: {customRender: 'target'},align:'center',width: 150},
-        {title: '留言内容',dataIndex: 'content',key: 'content'},
-        {title: '操作',scopedSlots: {customRender: 'action'},width: 120,align: 'center',fixed: 'right'}
+        {title: '留言内容',dataIndex: 'content',key: 'content',width: 500},
+        {title: '回复内容',dataIndex: 'replyContent',key: 'replyContent'},
+        {title: '操作',scopedSlots: {customRender: 'action'},width: 140,align: 'center',fixed: 'right'}
       ],
       data: [],
       loading: false,
@@ -88,10 +106,37 @@ export default {
       },
       pageNum: 1,
       pageSize: 10,
-      userList: []
+      userList: [],
+      id: undefined
+    }
+  },
+  watch: {
+    visible(val) {
+      if(!val) {
+        this.content = ''
+        this.id = undefined
+      }
     }
   },
   methods: {
+    // 回复提交
+    handleReplyOk() {
+      replyMessage({
+        id: this.id,
+        replyContent: this.content
+      }).then(res => {
+        if(res.code == 200) {
+          this.showMessage(res,this.getList)
+          this.visible = false
+        }
+      })
+    },
+    // 回复
+    handleReplyClick(r) {
+      console.log(r)
+      this.visible = true
+      this.id = r._id
+    },
     // 新增
     handleAddClick() {
       this.$refs.CreateModal.status = 1

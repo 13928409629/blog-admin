@@ -25,7 +25,7 @@
       <a-form-model-item label="排序">
         <a-input-number style="width:100px" v-model="form.sortNum" placeholder="排序" />
       </a-form-model-item>
-      <!-- <a-form-model-item label="图片" v-if="form.type==2" required>
+      <a-form-model-item label="图片">
         <a-upload
           :customRequest="handleUploadChange"
           list-type="picture-card"
@@ -38,7 +38,7 @@
             <div class="ant-upload-text">上传图片</div>
           </div>
         </a-upload>
-      </a-form-model-item> -->
+      </a-form-model-item>
     </a-form-model>
     <div
       :style="{
@@ -85,7 +85,7 @@ export default {
         parentId: undefined,
         title: undefined,
         path: undefined,
-        // imgUrl: undefined,
+        menuImg: undefined,
         sortNum: undefined
       },
       rules: {
@@ -117,11 +117,12 @@ export default {
       formdata.append('file', file)
       uploadFile(formdata).then(res => {
         if(res.code == 200) {
-          file.url = process.env.VUE_APP_API_ORIGIN+res.data
-          file.uid = Math.random()
-          file.fileame = getFileName( res.data )
+          file.url = res.data.link
+          file.uid = res.data._id
+          file.id = res.data._id
+          file.fileame = getFileName( res.data.link )
           _this.fileList.push(file)
-          _this.form.imgUrl = res.data
+          _this.form.menuImg = res.data._id
         }else {
           _this.$message.error(res.message)
         }
@@ -139,7 +140,6 @@ export default {
     onSubmit () {
       this.$refs.ruleForm.validate(vaild => {
         if(vaild) {
-          this.form.href = this.form.type == 2 ? '/products': '/product_list'
           if(this.status==1) {
             insertMenu(this.form).then(res => {
               if(res.code == 200) {
@@ -173,6 +173,7 @@ export default {
       for(const key in this.form) {
         this.form[key] = undefined
       }
+      this.fileList = []
     }
   }
 }

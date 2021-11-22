@@ -38,6 +38,7 @@
 <script>
 import { getMenuList,deleteMenu } from '@/api/manage'
 import { showMessage } from '@/utils/mixins'
+import { getFileName } from '@/utils/util'
 import CreateModal from './modules/CreateModal.vue'
 
 export default {
@@ -85,15 +86,20 @@ export default {
       this.$refs.createModal.id = r._id
       const _form = this.$refs.createModal.form
       for(const key in _form) {
-        _form[key] = r[key]
+        if(key != 'menuImg') {
+          _form[key] = r[key]
+        }else {
+          _form[key] = r[key]._id
+        }
       }
       // 这是系列带图片的菜单
-      if(r.type==2) {
+      if(r.menuImg) {
         this.$refs.createModal.fileList = [
           {
-            name: r.title,
-            uid: r._id,
-            url: process.env.VUE_APP_API_ORIGIN+r.imgUrl || ''
+            name: getFileName(r.menuImg.link),
+            uid: r.menuImg._id,
+            id: r.menuImg._id,
+            url: r.menuImg.link
           }
         ]
       }

@@ -20,6 +20,7 @@ const api = {
   deleteMessage: '/message/delete', // 删除留言
   getMessageList: '/message/list', // 查询留言列表
   updateMessage: '/message/update', // 修改留言
+  replyMessage: '/message/reply', //回复留言
 
   getUserList: '/user/list', // 获取用户列表
   getSystemInfo: '/system/list', //查询系统设置信息
@@ -147,6 +148,13 @@ export function getMessageList (params) {
 export function updateMessage (params) {
   return request({
     url: api.updateMessage,
+    method: 'post',
+    data: params
+  })
+}
+export function replyMessage (params) {
+  return request({
+    url: api.replyMessage,
     method: 'post',
     data: params
   })
