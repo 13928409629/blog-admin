@@ -144,7 +144,9 @@ export default {
       this.$refs.CreateModal.title = '修改文章'
       for(const key in _form) {
         if(key == 'tag') {
-          _form[key] = r.tag && r.tag[0]._id
+          if(r.tag && r.tag.length) {
+            _form[key] = r.tag[0]._id
+          }
         }else if(key == 'menuId') {
           _form[key] = r.menuId && r.menuId._id
         }else {
